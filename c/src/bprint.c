@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 
-void log(const char *text) {
+void bprint(const char *text) {
     int text_length = strlen(text);
     int border_length = text_length + 4;
 
@@ -14,17 +14,17 @@ void log(const char *text) {
     printf("\n");
 
     printf("* ");
-    for (int i = 0; i < border_length; i++) {
-        putchar('*');
+    for (int i = 0; i < text_length; i++) {
+        putchar(text[i]);
         fflush(stdout);
         usleep(19500);
     }
-    print(" *\n");
+    printf(" *\n");
 
     for (int i = 0; i < border_length; i++) {
         putchar('*');
         fflush(stdout);
         usleep(19500);
     }
-    print("\n");
+    printf("\n");
 }

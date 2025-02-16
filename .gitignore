@@ -1,3 +1,11 @@
 # python files
 py/__pycache__
 py/database.json
+
+# c files
+c/src/main.o
+c/src/bprint.o
+c/src/db.o
+c/src/cJSON.o
+c/program
+c/database.json

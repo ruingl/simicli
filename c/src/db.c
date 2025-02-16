@@ -54,20 +54,26 @@ cJSON *init_database() {
     cJSON *json = cJSON_Parse(json_data);
     free(json_data);
 
-    return json ? json : cJSON_CreateObject();
+    if (!json) {
+        json = cJSON_CreateObject();
+        seed_database();
+    }
+
+    return json;
 }
 
-char *get_response(const char *query) {
+char *get_response(char *query) {
     cJSON *json = init_database();
     if (!json) return NULL;
+
     if (!query) {
         cJSON_Delete(json);
         return strdup("Invalid query.");
     }
 
     cJSON *response = cJSON_GetObjectItemCaseSensitive(json, query);
-
     char *result;
+
     if (cJSON_IsString(response)) {
         result = strdup(response->valuestring);
     } else {
@@ -78,13 +84,20 @@ char *get_response(const char *query) {
     return result;
 }
 
-int add_response(const char *query, const char *response) {
+int add_response(char *query, char *response) {
+    FILE *file = fopen("database.json", "w");
+    if (!file) return 0;
+
     cJSON *json = init_database();
-    if (!json) return 0;
+    if (!json) {
+        fclose(file);
+        return 0;
+    }
 
     cJSON *new_response = cJSON_CreateString(response);
     if (!new_response) {
         cJSON_Delete(json);
+        fclose(file);
         return 0;
     }
 
@@ -94,9 +107,6 @@ int add_response(const char *query, const char *response) {
     } else {
         cJSON_AddItemToObject(json, query, new_response);
     }
-
-    FILE *file = fopen("database.json", "w");
-    if (!file) return 0;
 
     char *json_str = cJSON_PrintUnformatted(json);
     fprintf(file, "%s", json_str);
